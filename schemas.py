@@ -41,6 +41,21 @@ class Product(BaseModel):
 # Add your own schemas here:
 # --------------------------------------------------
 
+class Lead(BaseModel):
+    """Leads collected from the landing page
+    Collection name: "lead"
+    """
+    name: Optional[str] = Field(None, description="Имя клиента")
+    phone: str = Field(..., description="Телефон для связи")
+    city: Optional[str] = Field(None, description="Город/посёлок")
+    water_issue: Optional[str] = Field(None, description="Описание проблемы с водой")
+    message: Optional[str] = Field(None, description="Комментарий")
+    source: str = Field("landing", description="Источник лида")
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+    consent: bool = Field(True, description="Согласие на обработку персональных данных")
+
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
 # 2. Use them for document validation when creating/editing

@@ -1,8 +1,11 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional
+from database import create_document
 
-app = FastAPI()
+app = FastAPI(title="Dukat Snab API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -12,13 +15,33 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+class LeadIn(BaseModel):
+    name: Optional[str] = None
+    phone: str
+    city: Optional[str] = None
+    water_issue: Optional[str] = None
+    message: Optional[str] = None
+    source: str = "landing"
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+    consent: bool = True
+
+
 @app.get("/")
 def read_root():
-    return {"message": "Hello from FastAPI Backend!"}
+    return {"message": "Dukat Snab backend running"}
 
-@app.get("/api/hello")
-def hello():
-    return {"message": "Hello from the backend API!"}
+
+@app.post("/api/leads")
+def create_lead(lead: LeadIn):
+    try:
+        lead_id = create_document("lead", lead)
+        return {"ok": True, "id": lead_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/test")
 def test_database():
